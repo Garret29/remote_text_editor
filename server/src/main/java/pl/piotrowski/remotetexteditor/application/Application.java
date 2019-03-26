@@ -1,4 +1,4 @@
-package pl.piotrowski.remotetexteditor;
+package pl.piotrowski.remotetexteditor.application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
