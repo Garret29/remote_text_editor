@@ -9,6 +9,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
-public interface DocumentsDAO extends JpaRepository<Document, String>, pl.piotrowski.remotetexteditor.application.DocumentsDAO {
+public interface DocumentsDAO extends JpaRepository<Document, Long>, pl.piotrowski.remotetexteditor.application.DocumentsDAO {
     Optional<Document> getByName(String name);
 }
