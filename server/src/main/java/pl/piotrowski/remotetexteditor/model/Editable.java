@@ -1,6 +1,6 @@
-package pl.piotrowski.remotetexteditor.application;
+package pl.piotrowski.remotetexteditor.model;
 
-public interface Document {
+public interface Editable {
     void insertContent(String content, int position);
     void replaceContent(String content, int position);
 }

@@ -5,9 +5,10 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-public class Document implements pl.piotrowski.remotetexteditor.application.Document, Serializable {
+public class Document implements Editable, Serializable {
 
     @Id
+    @SequenceGenerator(name = "seq_gen", sequenceName = "seq")
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "seq_gen")
     private Long id;
     @Column(unique = true)

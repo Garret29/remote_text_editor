@@ -2,7 +2,7 @@ package pl.piotrowski.remotetexteditor.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.piotrowski.remotetexteditor.application.Document;
+import pl.piotrowski.remotetexteditor.model.Document;
 import pl.piotrowski.remotetexteditor.dataaccess.DocumentsDAO;
 
 import java.util.HashSet;
@@ -18,8 +18,8 @@ public class DocumentsService implements pl.piotrowski.remotetexteditor.applicat
     }
 
     @Override
-    public void addDocument(String name) {
-
+    public void addDocument(Document document) {
+        documentsDAO.saveAndFlush(document);
     }
 
     @Override
