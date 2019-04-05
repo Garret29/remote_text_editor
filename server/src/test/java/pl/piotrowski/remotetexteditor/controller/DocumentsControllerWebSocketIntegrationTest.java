@@ -1,17 +1,15 @@
-package pl.piotrowski.remotetexteditor.test;
+package pl.piotrowski.remotetexteditor.controller;
 
 import org.springframework.test.context.ContextConfiguration;
-import pl.piotrowski.remotetexteditor.test.configuration.TestContext;
+import pl.piotrowski.remotetexteditor.configuration.TestContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.piotrowski.remotetexteditor.Application;
 import pl.piotrowski.remotetexteditor.application.DocumentsService;
-import pl.piotrowski.remotetexteditor.controller.DocumentsController;
 import pl.piotrowski.remotetexteditor.model.Document;
 
 import java.util.function.Supplier;
@@ -32,7 +30,7 @@ public class DocumentsControllerWebSocketIntegrationTest {
     public void updateDocumentTest() throws Exception {
         Document document = testDocumentFactory.get();
 
-        willDoNothing().given(documentsService).updateDocument(document.getName(), document.getContent());
+        willDoNothing().given(documentsService).updateDocumentsContent(document.getName(), document.getContent());
 
 
 

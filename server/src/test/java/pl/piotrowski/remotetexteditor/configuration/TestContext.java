@@ -1,4 +1,4 @@
-package pl.piotrowski.remotetexteditor.test.configuration;
+package pl.piotrowski.remotetexteditor.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.test.context.TestConfiguration;

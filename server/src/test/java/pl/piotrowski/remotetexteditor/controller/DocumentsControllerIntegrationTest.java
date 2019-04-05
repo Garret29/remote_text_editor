@@ -1,21 +1,20 @@
-package pl.piotrowski.remotetexteditor.test;
+package pl.piotrowski.remotetexteditor.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.context.ContextConfiguration;
-import pl.piotrowski.remotetexteditor.test.configuration.TestContext;
+import org.springframework.test.context.junit4.SpringRunner;
+import pl.piotrowski.remotetexteditor.configuration.TestContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import pl.piotrowski.remotetexteditor.Application;
 import pl.piotrowski.remotetexteditor.application.DocumentsService;
-import pl.piotrowski.remotetexteditor.controller.DocumentsController;
 import pl.piotrowski.remotetexteditor.model.Document;
 
 import java.util.HashMap;
@@ -30,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @WebMvcTest(DocumentsController.class)
 @ContextConfiguration(classes = {TestContext.class, Application.class})
 public class DocumentsControllerIntegrationTest {

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import pl.piotrowski.remotetexteditor.model.Document;
 import pl.piotrowski.remotetexteditor.model.Editable;
 import pl.piotrowski.remotetexteditor.application.DocumentsService;
+import pl.piotrowski.remotetexteditor.service.exceptions.DocumentAlreadyExistsException;
+import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +30,12 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     @Override
     @GetMapping("/{name}")
     public ResponseEntity<Document> getDocument(@PathVariable String name) {
-        return ResponseEntity.ok().body(documentsService.getDocument(name));
+        try {
+            return ResponseEntity.ok().body(documentsService.getDocument(name));
+        } catch (DocumentNotFoundException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 
     @Override
@@ -42,7 +49,11 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     @PostMapping
     public ResponseEntity<Document> createDocument(@RequestParam String name, @RequestParam(defaultValue = "") String content) {
         Document document = new Document(name, content);
-        documentsService.addDocument(document);
+        try {
+            documentsService.addDocument(document);
+        } catch (DocumentAlreadyExistsException e) {
+            e.printStackTrace();
+        }
 
         return ResponseEntity.ok(document);
     }
@@ -52,8 +63,16 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     public ResponseEntity<HashMap<String, Document>> deleteDocument(@PathVariable String name) {
         HashMap<String, Document> documents = new HashMap<>();
 
-        documents.put("deleted", documentsService.getDocument(name));
-        documentsService.removeDocument(name);
+        try {
+            documents.put("deleted", documentsService.getDocument(name));
+        } catch (DocumentNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            documentsService.removeDocument(name);
+        } catch (DocumentNotFoundException e) {
+            e.printStackTrace();
+        }
 
         return ResponseEntity.ok(documents);
     }
@@ -67,7 +86,11 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     @Override
     @PatchMapping("/{name}")
     public ResponseEntity<?> renameDocument(@PathVariable String name, @RequestParam String newName) {
-        documentsService.changeDocumentsName(name, newName);
+        try {
+            documentsService.changeDocumentsName(name, newName);
+        } catch (DocumentNotFoundException e) {
+            e.printStackTrace();
+        }
         return ResponseEntity.ok().build();
     }
 }

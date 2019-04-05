@@ -1,19 +1,21 @@
 package pl.piotrowski.remotetexteditor.application;
 
 import pl.piotrowski.remotetexteditor.model.Document;
+import pl.piotrowski.remotetexteditor.service.exceptions.DocumentAlreadyExistsException;
+import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
 import java.util.HashSet;
 
 public interface DocumentsService {
-    void addDocument(Document document);
+    Document addDocument(Document document) throws DocumentAlreadyExistsException;
 
-    void removeDocument(String name);
+    Document removeDocument(String name) throws DocumentNotFoundException;
 
-    void changeDocumentsName(String oldName, String newName);
+    Document changeDocumentsName(String oldName, String newName) throws DocumentNotFoundException;
 
-    void updateDocument(String name, String newContent);
+    Document updateDocumentsContent(String name, String newContent) throws DocumentNotFoundException;
 
-    Document getDocument(String name);
+    Document getDocument(String name) throws DocumentNotFoundException;
 
     HashSet<Document> getAllDocuments();
 }

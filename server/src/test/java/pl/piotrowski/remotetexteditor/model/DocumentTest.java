@@ -1,4 +1,4 @@
-package pl.piotrowski.remotetexteditor.test;
+package pl.piotrowski.remotetexteditor.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -10,8 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.piotrowski.remotetexteditor.model.Document;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {Document.class})
 public class DocumentTest {
     private Document document;
 
