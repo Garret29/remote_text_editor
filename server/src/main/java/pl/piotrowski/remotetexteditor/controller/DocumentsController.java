@@ -7,7 +7,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import pl.piotrowski.remotetexteditor.model.Document;
-import pl.piotrowski.remotetexteditor.model.Editable;
 import pl.piotrowski.remotetexteditor.application.DocumentsService;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentAlreadyExistsException;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;

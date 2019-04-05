@@ -1,38 +1,37 @@
 package pl.piotrowski.remotetexteditor.controller;
 
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
-import pl.piotrowski.remotetexteditor.configuration.TestContext;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import pl.piotrowski.remotetexteditor.Application;
 import pl.piotrowski.remotetexteditor.application.DocumentsService;
+import pl.piotrowski.remotetexteditor.configuration.TestContext;
 import pl.piotrowski.remotetexteditor.model.Document;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.function.Supplier;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(DocumentsController.class)
 @ContextConfiguration(classes = {TestContext.class, Application.class})
-public class DocumentsControllerIntegrationTest {
+class DocumentsControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,7 +45,7 @@ public class DocumentsControllerIntegrationTest {
     private DocumentsService documentsService;
 
     @Test
-    public void getDocumentTest() throws Exception {
+    void getDocumentTest() throws Exception {
 
         Document document = testDocumentFactory.get();
 
@@ -60,7 +59,7 @@ public class DocumentsControllerIntegrationTest {
     }
 
     @Test
-    public void getAllDocumentsTest() throws Exception {
+    void getAllDocumentsTest() throws Exception {
 
         HashSet<Document> documents = testDocumentsSetFactory.get();
 
@@ -76,7 +75,7 @@ public class DocumentsControllerIntegrationTest {
     }
 
     @Test
-    public void deleteDocumentTest() throws Exception {
+    void deleteDocumentTest() throws Exception {
 
         Document document = testDocumentFactory.get();
 
@@ -96,10 +95,10 @@ public class DocumentsControllerIntegrationTest {
     }
 
     @Test
-    public void createDocumentTest() throws Exception {
+    void createDocumentTest() throws Exception {
         Document document = testDocumentFactory.get();
 
-        willDoNothing().given(documentsService).addDocument(document);
+      given(documentsService.addDocument(document)).willReturn(document);
 
         MvcResult mvcResult = mockMvc.perform(post("/docs")
                 .param("name", document.getName())
@@ -112,11 +111,11 @@ public class DocumentsControllerIntegrationTest {
     }
 
     @Test
-    public void renameTest() throws Exception {
+    void renameTest() throws Exception {
         Document document = testDocumentFactory.get();
         String newName = "Foo";
 
-        willDoNothing().given(documentsService).changeDocumentsName(document.getName(), newName);
+        given(documentsService.changeDocumentsName(document.getName(), newName)).willReturn(document);
 
         mockMvc.perform(patch("/docs/{name}", document.getName()).param("newName", newName))
                 .andExpect(status().isOk()).andReturn();

@@ -11,8 +11,10 @@ public class Document implements Editable, Serializable {
     @SequenceGenerator(name = "seq_gen", sequenceName = "seq")
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "seq_gen")
     private Long id;
+
     @Column(unique = true)
     private String name;
+
     @Lob
     @Column
     private String content;

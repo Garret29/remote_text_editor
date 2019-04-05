@@ -1,29 +1,33 @@
 package pl.piotrowski.remotetexteditor.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.piotrowski.remotetexteditor.Application;
 import pl.piotrowski.remotetexteditor.configuration.TestContext;
 import pl.piotrowski.remotetexteditor.dataaccess.DocumentsRepository;
 import pl.piotrowski.remotetexteditor.model.Document;
+import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestContext.class, Application.class})
-public class DocumentsServiceTest {
+class DocumentsServiceTest {
 
     @Autowired
     private DocumentsService documentsService;
@@ -38,52 +42,54 @@ public class DocumentsServiceTest {
     private Document document;
     private HashSet<Document> documentHashSet;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         document = testDocumentFactory.get();
         documentHashSet = testDocumentSetFactory.get();
     }
 
 
     @Test
-    public void getDocumentTest() throws Exception {
-        given(documentsRepository.getByName(document.getName())).willReturn(Optional.of(document));
+    void getDocumentTest() throws Exception {
+        given(documentsRepository.findByName(document.getName())).willReturn(Optional.of(document));
         Document found = documentsService.getDocument(document.getName());
-        verify(documentsRepository).getByName(document.getName());
+        then(documentsRepository).should().findByName(document.getName());
         assertEquals(found, document);
     }
 
     @Test
-    public void addDocumentTest() {
+    void addDocumentTest() {
         given(documentsRepository.save(document)).willReturn(document);
         Document added = documentsService.addDocument(document);
-        verify(documentsRepository).save(document);
+        then(documentsRepository).should().save(document);
         assertEquals(document, added);
     }
 
     @Test
-    public void removeDocumentTest() throws Exception {
-        given(documentsRepository.deleteByName(document.getName())).willReturn(Optional.of(document));
-        Document removed = documentsService.removeDocument(document.getName());
-        verify(documentsRepository).deleteByName(document.getName());
-        assertEquals(removed, document);
+    void removeDocumentTest() throws Exception {
+        willDoNothing().given(documentsRepository).deleteByName(document.getName());
+
+        documentsService.removeDocument(document.getName());
+
+        then(documentsRepository).should().deleteByName(document.getName());
+//        verify(documentsRepository).deleteByName(document.getName());
     }
 
     @Test
-    public void updateDocumentsContentTest() throws Exception {
+    void updateDocumentsContentTest() throws Exception {
         given(documentsRepository.save(document)).willReturn(document);
-        given(documentsRepository.getByName(document.getName())).willReturn(Optional.of(document));
+        given(documentsRepository.findByName(document.getName())).willReturn(Optional.of(document));
         Document updated = documentsService.updateDocumentsContent(document.getName(), "New content!");
         document.setContent("New Content!");
-        verify(documentsRepository).save(document);
+        then(documentsRepository).should().save(document);
         assertEquals(updated, document);
     }
 
     @Test
-    public void getAllDocumentsTest() throws Exception {
+    void getAllDocumentsTest() {
         given(documentsRepository.getAll()).willReturn(documentHashSet.stream());
         HashSet<Document> found = documentsService.getAllDocuments();
-        verify(documentsRepository).getAll();
+        then(documentsRepository).should().getAll();
         assertEquals(documentHashSet, found);
     }
 }

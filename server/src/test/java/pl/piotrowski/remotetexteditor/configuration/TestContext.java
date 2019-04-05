@@ -17,10 +17,7 @@ public class TestContext {
             String name = "HW";
             String content = "Hello World";
 
-            Document document = new Document(name, content);
-            document.setId((long) 0);
-
-            return document;
+            return new Document(name, content);
         };
     }
 
@@ -31,7 +28,6 @@ public class TestContext {
             Random random = new Random();
             for(int i=0; i<20; i++){
                 Document document = new Document("HW"+i,  Long.toString(random.nextLong()));
-                document.setId((long) i);
                 documents.add(document);
             }
             return documents;

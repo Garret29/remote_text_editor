@@ -9,7 +9,7 @@ import java.util.HashSet;
 public interface DocumentsService {
     Document addDocument(Document document) throws DocumentAlreadyExistsException;
 
-    Document removeDocument(String name) throws DocumentNotFoundException;
+    void removeDocument(String name) throws DocumentNotFoundException;
 
     Document changeDocumentsName(String oldName, String newName) throws DocumentNotFoundException;
 
