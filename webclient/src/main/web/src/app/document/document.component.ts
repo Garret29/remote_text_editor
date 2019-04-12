@@ -11,10 +11,10 @@ import {WebSocketService} from "../services/web-socket.service";
   styleUrls: ['./document.component.css']
 })
 export class DocumentComponent implements OnInit {
-  private documents: Document[];
-  private currentDocument: Document;
-  private newDocument: Document;
-  private newName: String;
+  documents: Document[];
+  currentDocument: Document;
+  newDocument: Document;
+  newName: String;
 
   constructor(
     private documentService: DocumentService,

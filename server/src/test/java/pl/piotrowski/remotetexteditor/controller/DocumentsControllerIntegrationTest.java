@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(DocumentsController.class)
 @ContextConfiguration(classes = {TestContext.class, Application.class})
+@ActiveProfiles("test")
 class DocumentsControllerIntegrationTest {
 
     @Autowired
@@ -69,7 +72,7 @@ class DocumentsControllerIntegrationTest {
         HashSet<Document> documentsFromResponse = objectMapper
                 .readValue(mvcResult.getResponse().getContentAsString(),
                         new TypeReference<HashSet<Document>>() {
-        });
+                        });
 
         assertEquals(documents, documentsFromResponse);
     }
@@ -85,9 +88,10 @@ class DocumentsControllerIntegrationTest {
         MvcResult mvcResult = mockMvc.perform(delete("/docs/{name}/delete", document.getName()))
                 .andExpect(status().isOk()).andReturn();
 
-        HashMap<String,Document> response = objectMapper
+        HashMap<String, Document> response = objectMapper
                 .readValue(mvcResult.getResponse().getContentAsString(),
-                        new TypeReference<HashMap<String,Document>>(){});
+                        new TypeReference<HashMap<String, Document>>() {
+                        });
 
         assertEquals(response.get("deleted").getName(), document.getName());
 
@@ -98,11 +102,11 @@ class DocumentsControllerIntegrationTest {
     void createDocumentTest() throws Exception {
         Document document = testDocumentFactory.get();
 
-      given(documentsService.addDocument(document)).willReturn(document);
+        given(documentsService.addDocument(document)).willReturn(document);
 
         MvcResult mvcResult = mockMvc.perform(post("/docs")
-                .param("name", document.getName())
-                .param("content", document.getContent()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(document)))
                 .andExpect(status().isOk()).andReturn();
 
         Document addedDocument = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Document.class);

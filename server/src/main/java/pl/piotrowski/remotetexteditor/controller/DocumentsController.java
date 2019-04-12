@@ -60,7 +60,7 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     @PostMapping
     public ResponseEntity<Document> createDocument(@RequestBody Document document) {
         try {
-            documentsService.addDocument(document);
+           document = documentsService.addDocument(document);
         } catch (DocumentAlreadyExistsException e) {
             e.printStackTrace();
         }

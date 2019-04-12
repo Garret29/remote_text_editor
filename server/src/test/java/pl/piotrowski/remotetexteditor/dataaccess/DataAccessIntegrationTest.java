@@ -1,14 +1,18 @@
 package pl.piotrowski.remotetexteditor.dataaccess;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.piotrowski.remotetexteditor.Application;
@@ -29,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ContextConfiguration(classes = {TestContext.class, Application.class})
+@ActiveProfiles("test")
 public class DataAccessIntegrationTest {
     @Autowired
     private TestEntityManager entityManager;
