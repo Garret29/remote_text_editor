@@ -1,8 +1,10 @@
 package pl.piotrowski.remotetexteditor.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import pl.piotrowski.remotetexteditor.dataaccess.DocumentsRepository;
 import pl.piotrowski.remotetexteditor.model.Document;
 
 import java.util.HashSet;
@@ -38,4 +40,5 @@ public class TestContext {
     public ObjectMapper objectMapper(){
         return new ObjectMapper();
     }
+
 }

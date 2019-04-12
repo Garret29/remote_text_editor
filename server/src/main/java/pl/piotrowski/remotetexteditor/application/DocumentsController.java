@@ -3,10 +3,13 @@ package pl.piotrowski.remotetexteditor.application;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import pl.piotrowski.remotetexteditor.model.Document;
 
 public interface DocumentsController {
-    ResponseEntity<?> updateDocumentsContent(String name, String content);
-    ResponseEntity<?> createDocument(String name, String content);
+    String updateDocumentsContent(String name, String content
+//            , int position, boolean isReplacing
+    );
+    ResponseEntity<?> createDocument(Document document);
     ResponseEntity<?> deleteDocument(String name);
     ResponseEntity<?> getDocument(String name);
     ResponseEntity<?> getDocuments();

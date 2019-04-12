@@ -13,10 +13,12 @@ import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundExcepti
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
 
 
 @Controller
 @RequestMapping("/docs")
+@CrossOrigin
 public class DocumentsController implements pl.piotrowski.remotetexteditor.application.DocumentsController {
 
     private DocumentsService documentsService;
@@ -27,33 +29,41 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     }
 
     @Override
+    @MessageMapping("/update/{name}")
+    @SendTo("/topic/updates/{name}")
+    public String updateDocumentsContent(@PathVariable String name, @RequestBody String content
+//            , @RequestParam(defaultValue = "0") int position, @RequestParam(defaultValue = "true") boolean isReplacing
+    ) {
+        CompletableFuture<Document> completableFuture = CompletableFuture.supplyAsync(()-> {
+            try {
+                return documentsService.updateDocumentsContent(name, content);
+            } catch (DocumentNotFoundException e) {
+                throw new RuntimeException("Error");
+            }
+        });
+
+        return content;
+    }
+
+    @Override
     @GetMapping("/{name}")
     public ResponseEntity<Document> getDocument(@PathVariable String name) {
         try {
             return ResponseEntity.ok().body(documentsService.getDocument(name));
         } catch (DocumentNotFoundException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(404).build();
         }
     }
 
     @Override
-    @MessageMapping("/{name}")
-    @SendTo("/topic/updates")
-    public ResponseEntity<String> updateDocumentsContent(@PathVariable String name, @RequestBody String content) {
-        return null;
-    }
-
-    @Override
     @PostMapping
-    public ResponseEntity<Document> createDocument(@RequestParam String name, @RequestParam(defaultValue = "") String content) {
-        Document document = new Document(name, content);
+    public ResponseEntity<Document> createDocument(@RequestBody Document document) {
         try {
             documentsService.addDocument(document);
         } catch (DocumentAlreadyExistsException e) {
             e.printStackTrace();
         }
-
         return ResponseEntity.ok(document);
     }
 
@@ -64,13 +74,9 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
 
         try {
             documents.put("deleted", documentsService.getDocument(name));
-        } catch (DocumentNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
             documentsService.removeDocument(name);
         } catch (DocumentNotFoundException e) {
-            e.printStackTrace();
+            return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok(documents);
@@ -84,12 +90,13 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
 
     @Override
     @PatchMapping("/{name}")
-    public ResponseEntity<?> renameDocument(@PathVariable String name, @RequestParam String newName) {
+    public ResponseEntity<String> renameDocument(@PathVariable String name, @RequestParam String newName) {
         try {
-            documentsService.changeDocumentsName(name, newName);
+            String string = documentsService.changeDocumentsName(name, newName).getName();
+            return ResponseEntity.ok(string);
         } catch (DocumentNotFoundException e) {
-            e.printStackTrace();
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().build();
+
     }
 }

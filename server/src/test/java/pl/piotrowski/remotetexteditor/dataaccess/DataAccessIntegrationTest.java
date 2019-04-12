@@ -1,5 +1,6 @@
 package pl.piotrowski.remotetexteditor.dataaccess;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.piotrowski.remotetexteditor.Application;
@@ -15,13 +17,14 @@ import pl.piotrowski.remotetexteditor.configuration.TestContext;
 import pl.piotrowski.remotetexteditor.model.Document;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
+import javax.persistence.PersistenceException;
+import javax.print.Doc;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -31,8 +34,6 @@ public class DataAccessIntegrationTest {
     private TestEntityManager entityManager;
     @Autowired
     private DocumentsRepository documentsRepository;
-    @Autowired
-    private DocumentsService documentsService;
     @Autowired
     private Supplier<Document> testDocumentFactory;
     @Autowired
@@ -49,11 +50,6 @@ public class DataAccessIntegrationTest {
         entityManager.persist(document);
         documents.forEach(document -> entityManager.persist(document));
         entityManager.flush();
-    }
-
-    @AfterEach
-    void destroy() {
-        entityManager.clear();
     }
 
     @Test
@@ -76,9 +72,15 @@ public class DataAccessIntegrationTest {
         documentsRepository.deleteByName(document.getName());
 
         Optional<Document> foundOptional = documentsRepository.findByName(document.getName());
-        assertThrows(DocumentNotFoundException.class,
-                () -> foundOptional.orElseThrow(() -> new DocumentNotFoundException("Exception"))
-        );
+        assertFalse(foundOptional.isPresent());
 
+    }
+
+    @Test
+    void saveDuplicateThrowsException() {
+        Document newDoc = new Document("Hello there!","General Kenobi!");
+        documentsRepository.save(newDoc);
+        documentsRepository.save(new Document("Hello there!", "Hi!"));
+        assertThrows(PersistenceException.class, ()-> entityManager.flush());
     }
 }

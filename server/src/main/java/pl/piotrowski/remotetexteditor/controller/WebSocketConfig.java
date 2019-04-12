@@ -6,12 +6,7 @@ import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
-
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry stompEndpointRegistry) {
-        stompEndpointRegistry.addEndpoint("/documents");
-    }
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer  {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -19,5 +14,10 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/app");
     }
 
-
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws/docs")
+                .setAllowedOrigins("*")
+                .withSockJS();
+    }
 }
