@@ -11,8 +11,15 @@ export class WebConfig {
   public readonly topicUrl;
 
   constructor(){
-    this.restUrl = "http://localhost:8080/docs";
-    this.wsUrl = "http://localhost:8080/ws/docs";
+    let url=location.href;
+
+    if(url.search("localhost")!==-1){
+      console.log(url);
+      url = "http://localhost:8080/"
+    }
+
+    this.restUrl = url+"docs";
+    this.wsUrl = url+"ws/docs";
     this.messageUrl = "/app/update";
     this.topicUrl = "/topic/updates";
   }

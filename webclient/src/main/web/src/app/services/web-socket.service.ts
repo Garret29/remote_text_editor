@@ -23,15 +23,16 @@ export class WebSocketService {
   }
 
   private connect(document: Document): Subject<String> {
+    const ws = new SockJS(this.webConfig.wsUrl);
     const observable = Rx.Observable.create((obs) => {
 
       if(this.stomp){
         this.stomp.disconnect(()=>{
-
+          console.log("disconnecting...")
         })
       }
 
-      const ws = new SockJS(this.webConfig.wsUrl);
+
       this.stomp = Stomp.over(ws);
       this.stomp.connect({}, (frame) => {
         console.log(frame);
@@ -39,20 +40,19 @@ export class WebSocketService {
           obs.next(response.body)
         });
       });
-
-      // return () => {
-      //   this.stomp.disconnect(() => {
-      //     console.log("unsub");
-      //     this.connection = null;
-      //     obs.complete()
-      //   }, {})
-      // }
     });
 
     const observer = {
       next: (data) => {
         this.stomp.send(this.webConfig.messageUrl + "/" + document.name, {}, data)
-      }
+      },
+      complete: ()=>{
+          this.stomp.disconnect(()=>{
+            console.log("disconnecting...");
+            ws.close();
+            this.connection = null;
+          })
+        }
     };
 
     return Rx.Subject.create(observer, observable);

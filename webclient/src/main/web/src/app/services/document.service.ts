@@ -55,4 +55,11 @@ export class DocumentService implements OnInit{
   getUpdates(document: Document): Observable<String> {
     return this.websocketService.getConnection(document).asObservable();
   }
+
+  connectToWs(document: Document) {
+    if (this.websocket){
+      this.websocket.complete()
+    }
+    this.websocket = this.websocketService.getConnection(document);
+  }
 }

@@ -30,8 +30,10 @@ export class DocumentComponent implements OnInit {
   updateDocumentList() {
     this.documentService.getDocuments().subscribe((docs) => {
         this.documents = docs;
-        this.currentDocument = docs[0];
-        this.startUpdating();
+        if (docs.length>0){
+          this.currentDocument = docs[0];
+          this.documentChanged();
+        }
       },
       (error) => {
       },
@@ -107,12 +109,10 @@ export class DocumentComponent implements OnInit {
     return this.newName.length === 0;
   }
 
-  documentSelected(selectedDocument: Document) {
-
-  }
 
   documentChanged() {
     console.log("changed");
+    this.documentService.connectToWs(this.currentDocument);
     this.startUpdating();
   }
 }
