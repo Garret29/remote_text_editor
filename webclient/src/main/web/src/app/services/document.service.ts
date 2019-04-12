@@ -32,6 +32,10 @@ export class DocumentService implements OnInit{
     return this.http.get<Document[]>(this.webConfig.restUrl);
   }
 
+  getDocument(name: String): Observable<Document>{
+    return this.http.get<Document>(this.webConfig.restUrl+"/"+name)
+  }
+
   addNewDocument(document: Document): Observable<Document> {
     return this.http.post<Document>(this.webConfig.restUrl, document);
   }
@@ -57,7 +61,9 @@ export class DocumentService implements OnInit{
   }
 
   connectToWs(document: Document) {
+    console.log("check 0");
     if (this.websocket){
+      console.log("check 1");
       this.websocket.complete()
     }
     this.websocket = this.websocketService.getConnection(document);

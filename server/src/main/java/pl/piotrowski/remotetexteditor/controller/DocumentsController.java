@@ -2,18 +2,19 @@ package pl.piotrowski.remotetexteditor.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import pl.piotrowski.remotetexteditor.model.Document;
 import pl.piotrowski.remotetexteditor.application.DocumentsService;
+import pl.piotrowski.remotetexteditor.model.Document;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentAlreadyExistsException;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.concurrent.CompletableFuture;
 
 
 @Controller
@@ -31,16 +32,21 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     @Override
     @MessageMapping("/update/{name}")
     @SendTo("/topic/updates/{name}")
-    public String updateDocumentsContent(@PathVariable String name, @RequestBody String content
+    public String updateDocumentsContent(@DestinationVariable String name, @Payload(required = false) String content
 //            , @RequestParam(defaultValue = "0") int position, @RequestParam(defaultValue = "true") boolean isReplacing
     ) {
-        CompletableFuture<Document> completableFuture = CompletableFuture.supplyAsync(()-> {
-            try {
-                return documentsService.updateDocumentsContent(name, content);
-            } catch (DocumentNotFoundException e) {
-                throw new RuntimeException("Error");
-            }
-        });
+        Document document;
+
+        if (content==null){
+            content="";
+        }
+
+        try {
+            document = documentsService.updateDocumentsContent(name, content);
+        } catch (DocumentNotFoundException e) {
+            e.printStackTrace();
+        }
+
 
         return content;
     }
@@ -60,7 +66,7 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     @PostMapping
     public ResponseEntity<Document> createDocument(@RequestBody Document document) {
         try {
-           document = documentsService.addDocument(document);
+            document = documentsService.addDocument(document);
         } catch (DocumentAlreadyExistsException e) {
             e.printStackTrace();
         }

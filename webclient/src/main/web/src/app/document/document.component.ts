@@ -112,7 +112,17 @@ export class DocumentComponent implements OnInit {
 
   documentChanged() {
     console.log("changed");
+    const initialContent = this.currentDocument.content;
     this.documentService.connectToWs(this.currentDocument);
+    this.documentService.getDocument(this.currentDocument.name).subscribe(
+      (document: Document)=>{
+        console.log(initialContent);
+        console.log(this.currentDocument.content);
+        if(initialContent==this.currentDocument.content){
+          this.currentDocument.content=document.content
+        }
+      }
+    );
     this.startUpdating();
   }
 }

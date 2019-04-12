@@ -26,13 +26,6 @@ export class WebSocketService {
     const ws = new SockJS(this.webConfig.wsUrl);
     const observable = Rx.Observable.create((obs) => {
 
-      if(this.stomp){
-        this.stomp.disconnect(()=>{
-          console.log("disconnecting...")
-        })
-      }
-
-
       this.stomp = Stomp.over(ws);
       this.stomp.connect({}, (frame) => {
         console.log(frame);
@@ -47,6 +40,7 @@ export class WebSocketService {
         this.stomp.send(this.webConfig.messageUrl + "/" + document.name, {}, data)
       },
       complete: ()=>{
+        console.log("check2");
           this.stomp.disconnect(()=>{
             console.log("disconnecting...");
             ws.close();
