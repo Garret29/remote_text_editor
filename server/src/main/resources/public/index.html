@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Remote Text Editor</title>
+    <script language="JavaScript" src="libraries/jquery-3.2.1.min.js"></script>
+</head>
+<script src="js/client.js"></script>
+<body>
+<label for="serverInfo">Adres serwera:</label>
+<input value="remote-text-editor.herokuapp.com" id="serverInfo">
+<button id="serverButton">Zatwierdź</button>
+<br>
+<label for="selectDoc">Dostępne dokumenty:</label>
+<select id="selectDoc"></select>
+<button id="refreshDocsButton">Odśwież</button>
+<br>
+<label for="newDocName">Nazwa nowego dokumentu:</label><input id="newDocName">
+<button id="addDocButton">Dodaj</button><br>
+<label for="newName"></label><input id="newName" type="text"><button id="changeNameButton">Zmień nazwę</button><br>
+
+<hr>
+<label for="textarea">Edytuj dokument</label><br>
+<textarea rows="40" cols="80" id="textarea"></textarea>
+<hr>
+<button id="deleteDocButton">Usuń dokument</button>
+</body>
+</html>
