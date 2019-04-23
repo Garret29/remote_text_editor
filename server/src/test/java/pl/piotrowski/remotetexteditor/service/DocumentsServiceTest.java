@@ -13,6 +13,7 @@ import pl.piotrowski.remotetexteditor.Application;
 import pl.piotrowski.remotetexteditor.configuration.TestContext;
 import pl.piotrowski.remotetexteditor.dataaccess.DocumentsRepository;
 import pl.piotrowski.remotetexteditor.model.Document;
+import pl.piotrowski.remotetexteditor.model.Update;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
 import java.util.HashSet;
@@ -37,6 +38,8 @@ class DocumentsServiceTest {
     private Supplier<Document> testDocumentFactory;
     @Autowired
     private Supplier<HashSet<Document>> testDocumentSetFactory;
+    @Autowired
+    private Supplier<Update> testUpdateFactory;
 
     @MockBean
     private DocumentsRepository documentsRepository;
@@ -74,17 +77,18 @@ class DocumentsServiceTest {
         documentsService.removeDocument(document.getName());
 
         then(documentsRepository).should().deleteByName(document.getName());
-//        verify(documentsRepository).deleteByName(document.getName());
     }
 
     @Test
     void updateDocumentsContentTest() throws Exception {
+        Update update = testUpdateFactory.get();
+
         given(documentsRepository.save(document)).willReturn(document);
         given(documentsRepository.findByName(document.getName())).willReturn(Optional.of(document));
-//        Document updated = documentsService.updateDocumentsContent(document.getName(), "New content!");
-//        document.setContent("New Content!");
-//        then(documentsRepository).should().save(document);
-//        assertEquals(updated, document);
+        Document updated = documentsService.updateDocumentsContent(document.getName(), update);
+        document.applyUpdate(update);
+        then(documentsRepository).should().save(document);
+        assertEquals(updated, document);
     }
 
     @Test
