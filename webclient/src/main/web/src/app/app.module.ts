@@ -7,11 +7,13 @@ import {RouterModule} from "@angular/router";
 
 import { AppComponent } from './app.component';
 import { DocumentComponent } from './document/document.component';
+import { BlockPasteDirective } from './directives/block-paste.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DocumentComponent
+    DocumentComponent,
+    BlockPasteDirective
   ],
   imports: [
     BrowserModule,

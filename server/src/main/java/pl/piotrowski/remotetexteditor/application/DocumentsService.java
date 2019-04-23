@@ -1,6 +1,7 @@
 package pl.piotrowski.remotetexteditor.application;
 
 import pl.piotrowski.remotetexteditor.model.Document;
+import pl.piotrowski.remotetexteditor.model.Update;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentAlreadyExistsException;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
@@ -13,7 +14,7 @@ public interface DocumentsService {
 
     Document changeDocumentsName(String oldName, String newName) throws DocumentNotFoundException;
 
-    Document updateDocumentsContent(String name, String newContent) throws DocumentNotFoundException;
+    Document updateDocumentsContent(String name, Update update) throws DocumentNotFoundException;
 
     Document getDocument(String name) throws DocumentNotFoundException;
 

@@ -1,20 +1,30 @@
 <div>
-  <select [(ngModel)]="currentDocument" (change)="documentChanged()">
-    <option *ngFor="let selectedDocument of documents" [ngValue]="selectedDocument" (change)="documentSelected(selectedDocument)">{{selectedDocument.name}}</option>
-  </select>
-  <button (click)="updateDocumentList()">Update list</button>
-  <label>New document's name:
-    <input type="text" [(ngModel)]="newDocument.name">
-  </label>
-  <button (click)="addNewDocument(newDocument)">Add</button>
-</div>
-<hr>
-<div>
-  <label *ngIf="currentDocument"> {{currentDocument.name}}:<br>
-    <textarea [(ngModel)]="currentDocument.content" (input)="updateDocument(currentDocument)"></textarea>
-  </label><br>
-  <button (click)="deleteDocument(currentDocument.name)">Delete current document!</button>
-  <label>Change document's name:<input type="text" [(ngModel)]="newName">
-    <button [disabled]="isRenamingDisabled()" (click)="renameDocument(currentDocument,newName)">Rename</button>
-  </label>
+  <div>
+    <select [(ngModel)]="currentDocument">
+      <option *ngFor="let selectedDocument of documents" [ngValue]="selectedDocument"
+              (change)="documentSelected(selectedDocument)">{{selectedDocument.name}}
+      </option>
+    </select>
+    <button (click)="updateDocumentList()">Update list</button>
+    <label>New document's name:
+      <input type="text" [(ngModel)]="newDocument.name">
+    </label>
+    <button (click)="addNewDocument(newDocument)">Add</button>
+  </div>
+  <hr>
+  <div>
+    <label *ngIf="currentDocument"> {{currentDocument.name}}:<br>
+      <textarea appBlockPaste #textArea [(ngModel)]="currentDocument.content"
+                (input)="textChanged($event ,currentDocument)"
+                (mousedown)="updateSelection()"
+                (mousemove)="updateSelection()"
+                (keydown)="updateSelection()"
+                (focus)="updateSelection()"
+      ></textarea>
+    </label><br>
+    <button (click)="deleteDocument(currentDocument.name)">Delete current document!</button>
+    <label>Change document's name:<input type="text" [(ngModel)]="newName">
+      <button [disabled]="isRenamingDisabled()" (click)="renameDocument(currentDocument,newName)">Rename</button>
+    </label>
+  </div>
 </div>
