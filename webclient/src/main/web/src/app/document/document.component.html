@@ -12,8 +12,8 @@
     <button (click)="addNewDocument(newDocument)">Add</button>
   </div>
   <hr>
-  <div>
-    <label *ngIf="currentDocument"> {{currentDocument.name}}:<br>
+  <div *ngIf="currentDocument">
+    <label> {{currentDocument.name}}:<br>
       <textarea appBlockPaste #textArea [(ngModel)]="currentDocument.content"
                 (input)="textChanged($event ,currentDocument)"
                 (mousedown)="updateSelection()"
