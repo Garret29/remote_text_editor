@@ -81,6 +81,13 @@ public class Document implements Editable, Serializable, Updatable {
 
     @Override
     public void applyUpdate(Update update) {
+        if (update.isAppending()){
+            content = content+update.getContent();
+        } else  {
+            String first = content.substring(0, update.getStart());
+            String last = content.substring(update.getEnd());
 
+            content = first+update.getContent()+last;
+        }
     }
 }

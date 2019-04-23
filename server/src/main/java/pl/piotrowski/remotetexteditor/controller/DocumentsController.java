@@ -34,12 +34,9 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     @MessageMapping("/update/{name}")
     @SendTo("/topic/updates/{name}")
     public Update updateDocumentsContent(@DestinationVariable String name, @Payload Update update) {
-        Document document;
-
-
 
         try {
-            document = documentsService.updateDocumentsContent(name, update);
+            documentsService.updateDocumentsContent(name, update);
         } catch (DocumentNotFoundException e) {
             e.printStackTrace();
         }

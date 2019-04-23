@@ -36,7 +36,6 @@ export class WebSocketSubject<T>{
     const observable = Rx.Observable.create((obs) => {
       stomp.connect({}, (frame) => {
         stomp.subscribe(this.webConfig.topicUrl + "/" + name, (response) => {
-          console.log(response.body);
           obs.next(JSON.parse(response.body))
         });
       });
