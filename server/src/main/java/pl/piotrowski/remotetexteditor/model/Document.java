@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-public class Document implements Editable, Serializable {
+public class Document implements Editable, Serializable, Updatable {
 
     @Id
     @SequenceGenerator(name = "seq_gen", sequenceName = "seq")
@@ -77,5 +77,17 @@ public class Document implements Editable, Serializable {
     public int hashCode() {
 
         return Objects.hash(getName());
+    }
+
+    @Override
+    public void applyUpdate(Update update) {
+        if (update.isAppending()){
+            content = content+update.getContent();
+        } else  {
+            String first = content.substring(0, update.getStart());
+            String last = content.substring(update.getEnd());
+
+            content = first+update.getContent()+last;
+        }
     }
 }

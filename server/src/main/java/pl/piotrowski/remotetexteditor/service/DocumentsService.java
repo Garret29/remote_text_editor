@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.piotrowski.remotetexteditor.dataaccess.DocumentsRepository;
 import pl.piotrowski.remotetexteditor.model.Document;
+import pl.piotrowski.remotetexteditor.model.Update;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
 import javax.transaction.Transactional;
@@ -42,11 +43,11 @@ public class DocumentsService implements pl.piotrowski.remotetexteditor.applicat
     }
 
     @Override
-    public Document updateDocumentsContent(String name, String newContent) throws DocumentNotFoundException {
+    public Document updateDocumentsContent(String name, Update update) throws DocumentNotFoundException {
         Optional<Document> optionalDocument = documentsRepository.findByName(name);
         Document found = optionalDocument.orElseThrow(
                 () -> new DocumentNotFoundException("Document with name '" + name + "' cannot be found!"));
-        found.setContent(newContent);
+        found.applyUpdate(update);
         return documentsRepository.save(found);
     }
 

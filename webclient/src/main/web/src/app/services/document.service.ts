@@ -1,20 +1,18 @@
 import {Injectable, OnInit} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
+import * as Rx from "rxjs/index"
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {WebConfig} from "../config/web-config.service";
 import {Document} from "../model/document";
-import {WebSocketService} from "./web-socket.service";
+import {Update} from "../model/update";
+import {WebSocketSubject} from "./webSocketSubject";
 
 @Injectable({
   providedIn: 'root'
 })
 export class DocumentService implements OnInit{
 
-  private websocket: Subject<String>;
-
   constructor(
     private http: HttpClient,
-    private websocketService: WebSocketService,
     private webConfig: WebConfig
   ) {}
 
@@ -22,29 +20,27 @@ export class DocumentService implements OnInit{
 
   }
 
-  updateDocument(document: Document, update: String) {
-    this.websocketService.getConnection(document).next(update);
+  getWsConnection(documentName: String): Rx.Observable<WebSocketSubject<Update>>{
+    return Rx.of(new WebSocketSubject(this.webConfig, documentName))
   }
 
-  getDocuments(): Observable<Document[]> {
-    console.log(this.webConfig.restUrl);
-
+  getDocuments(): Rx.Observable<Document[]> {
     return this.http.get<Document[]>(this.webConfig.restUrl);
   }
 
-  getDocument(name: String): Observable<Document>{
-    return this.http.get<Document>(this.webConfig.restUrl+"/"+name)
+  getDocument(documentName: String): Rx.Observable<Document>{
+    return this.http.get<Document>(this.webConfig.restUrl+"/"+documentName)
   }
 
-  addNewDocument(document: Document): Observable<Document> {
+  addNewDocument(document: Document): Rx.Observable<Document> {
     return this.http.post<Document>(this.webConfig.restUrl, document);
   }
 
-  deleteDocument(name: String): Observable<Document> {
-    return this.http.delete<Document>(this.webConfig.restUrl+"/"+name+"/delete");
+  deleteDocument(documentName: String): Rx.Observable<Document> {
+    return this.http.delete<Document>(this.webConfig.restUrl+"/"+documentName+"/delete");
   }
 
-  renameDocument(oldName: String, newName: String): Observable<String>{
+  renameDocument(oldName: String, newName: String): Rx.Observable<String>{
     const requestOptions: Object = {
       responseType: 'text'
     };
@@ -54,18 +50,5 @@ export class DocumentService implements OnInit{
       null,
       requestOptions
     );
-  }
-
-  getUpdates(document: Document): Observable<String> {
-    return this.websocketService.getConnection(document).asObservable();
-  }
-
-  connectToWs(document: Document) {
-    console.log("check 0");
-    if (this.websocket){
-      console.log("check 1");
-      this.websocket.complete()
-    }
-    this.websocket = this.websocketService.getConnection(document);
   }
 }

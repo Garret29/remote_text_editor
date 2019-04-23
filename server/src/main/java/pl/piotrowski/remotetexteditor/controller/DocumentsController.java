@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import pl.piotrowski.remotetexteditor.application.DocumentsService;
 import pl.piotrowski.remotetexteditor.model.Document;
+import pl.piotrowski.remotetexteditor.model.Update;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentAlreadyExistsException;
 import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
@@ -32,23 +33,16 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
     @Override
     @MessageMapping("/update/{name}")
     @SendTo("/topic/updates/{name}")
-    public String updateDocumentsContent(@DestinationVariable String name, @Payload(required = false) String content
-//            , @RequestParam(defaultValue = "0") int position, @RequestParam(defaultValue = "true") boolean isReplacing
-    ) {
-        Document document;
-
-        if (content==null){
-            content="";
-        }
+    public Update updateDocumentsContent(@DestinationVariable String name, @Payload Update update) {
 
         try {
-            document = documentsService.updateDocumentsContent(name, content);
+            documentsService.updateDocumentsContent(name, update);
         } catch (DocumentNotFoundException e) {
             e.printStackTrace();
         }
 
 
-        return content;
+        return update;
     }
 
     @Override

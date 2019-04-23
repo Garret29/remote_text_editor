@@ -4,10 +4,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import pl.piotrowski.remotetexteditor.model.Document;
+import pl.piotrowski.remotetexteditor.model.Update;
 
 public interface DocumentsController {
-    String updateDocumentsContent(String name, String content
-//            , int position, boolean isReplacing
+    Update updateDocumentsContent(String name, Update update
+//            , int start, boolean isReplacing
     );
     ResponseEntity<?> createDocument(Document document);
     ResponseEntity<?> deleteDocument(String name);

@@ -35,7 +35,7 @@ class DocumentsControllerWebSocketIntegrationTest {
     void updateDocumentTest() throws Exception {
         Document document = testDocumentFactory.get();
 
-        willDoNothing().given(documentsService).updateDocumentsContent(document.getName(), document.getContent());
+//        willDoNothing().given(documentsService).updateDocumentsContent(document.getName(), document.getContent());
 
 
 

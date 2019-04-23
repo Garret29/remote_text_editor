@@ -1,9 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {Observable} from "rxjs/index";
-import {Document} from "../model/document";
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {applyUpdate, Document} from "../model/document";
+import {createUpdate, Update} from "../model/update";
 import {DocumentService} from "../services/document.service";
-import {WebSocketService} from "../services/web-socket.service";
-
+import {WebSocketSubject} from "../services/webSocketSubject";
 
 @Component({
   selector: 'app-document',
@@ -14,7 +13,17 @@ export class DocumentComponent implements OnInit {
   documents: Document[];
   currentDocument: Document;
   newDocument: Document;
-  newName: String;
+  newName: string;
+  updateSubject: WebSocketSubject<Update>;
+  private textArea: ElementRef;
+  selectionStart: number;
+  selectionEnd: number;
+
+  @ViewChild("textArea")
+  set setTextArea(value: ElementRef) {
+    this.textArea = value;
+  }
+
 
   constructor(
     private documentService: DocumentService,
@@ -27,30 +36,20 @@ export class DocumentComponent implements OnInit {
     this.newName = "";
   }
 
+  updateCurrentDocument(update: Update) {
+    this.updateSubject.send(update)
+  }
+
   updateDocumentList() {
     this.documentService.getDocuments().subscribe((docs) => {
         this.documents = docs;
-        if (docs.length>0){
+        if (docs.length > 0) {
           this.currentDocument = docs[0];
-          this.documentChanged();
+          this.currentDocument.previousContent = this.currentDocument.content;
+          this.documentSelected(this.currentDocument)
         }
-      },
-      (error) => {
-      },
-      ()=>{
-
       }
-      )
-
-  }
-
-  private startUpdating() {
-    if (this.currentDocument) {
-      console.log("updating...");
-      this.documentService.getUpdates(this.currentDocument).subscribe((string) => {
-        this.currentDocument.content=string;
-      })
-    }
+    )
   }
 
   addNewDocument(document: Document) {
@@ -58,71 +57,66 @@ export class DocumentComponent implements OnInit {
       (document) => {
         this.documents.push(document);
         this.newDocument = new Document("", "")
-      },
-      (error) => {
-
-      },
-      ()=>{
-
       }
     );
   }
 
-  renameDocument(document: Document, newName: String){
-
+  renameDocument(document: Document, newName: String) {
     this.documentService.renameDocument(document.name, newName).subscribe(
-      (string)=>{
+      (string) => {
         this.updateDocumentList();
-        this.newName="";
-
-
-      },
-      (error)=>{
-
-      },
-      ()=>{
-
-      }
-    );
-
+        this.newName = "";
+      })
   }
 
   deleteDocument(name: String) {
     this.documentService.deleteDocument(name).subscribe(
-      (document)=>{
+      (document) => {
         this.updateDocumentList();
-      },
-      ()=>{
-
-      },
-      ()=>{
-
       }
     )
   }
 
-  updateDocument(document: Document) {
-    this.documentService.updateDocument(document, document.content)
+  documentSelected(document: Document) {
+    if (this.updateSubject) {
+      this.updateSubject.complete()
+    }
+    this.documentService.getWsConnection(document.name).subscribe((ws: WebSocketSubject<Update>) => {
+      this.updateSubject = ws;
+      this.updateSubject.subscribe((update: Update) => {
+        applyUpdate(document, update)
+      })
+    });
   }
 
-  isRenamingDisabled(): boolean {
+  isRenamingDisabled() {
     return this.newName.length === 0;
   }
 
+  textChanged(event, document: Document) {
 
-  documentChanged() {
-    console.log("changed");
-    const initialContent = this.currentDocument.content;
-    this.documentService.connectToWs(this.currentDocument);
-    this.documentService.getDocument(this.currentDocument.name).subscribe(
-      (document: Document)=>{
-        console.log(initialContent);
-        console.log(this.currentDocument.content);
-        if(initialContent==this.currentDocument.content){
-          this.currentDocument.content=document.content
-        }
+    let update: Update;
+
+    if (event.inputType === "deleteContentBackward") {
+      if (this.selectionStart === this.selectionEnd) {
+        update = createUpdate("", this.selectionStart - 1, this.selectionEnd, false)
+      } else {
+        update = createUpdate("", this.selectionStart, this.selectionEnd, false)
       }
-    );
-    this.startUpdating();
+    } else if (event.inputType === "deleteContentForward") {
+      update = createUpdate("", this.selectionStart, this.selectionEnd + 1, false)
+    } else if (event.inputType==="insertLineBreak") {
+      update = createUpdate("\n",this.selectionStart,this.selectionEnd,false)
+    } else {
+      const appending: boolean = this.selectionStart === this.selectionEnd && document.content.length === this.selectionEnd + 1;
+      update = createUpdate(document.content.substring(this.selectionStart, this.selectionEnd + 1), this.selectionStart, this.selectionEnd, appending)
+    }
+
+    this.updateCurrentDocument(update)
+  }
+
+  updateSelection() {
+    this.selectionStart = this.textArea.nativeElement.selectionStart;
+    this.selectionEnd = this.textArea.nativeElement.selectionEnd;
   }
 }
