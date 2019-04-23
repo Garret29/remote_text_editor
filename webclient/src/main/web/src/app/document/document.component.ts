@@ -19,6 +19,12 @@ export class DocumentComponent implements OnInit {
   selectionStart: number;
   selectionEnd: number;
 
+  @ViewChild("textArea")
+  set setTextArea(value: ElementRef) {
+    this.textArea = value;
+  }
+
+
   constructor(
     private documentService: DocumentService,
   ) {
@@ -86,12 +92,6 @@ export class DocumentComponent implements OnInit {
   isRenamingDisabled() {
     return this.newName.length === 0;
   }
-
-  @ViewChild("textArea")
-  set setTextArea(value: ElementRef) {
-    this.textArea = value;
-  }
-
 
   textChanged(event, document: Document) {
 
