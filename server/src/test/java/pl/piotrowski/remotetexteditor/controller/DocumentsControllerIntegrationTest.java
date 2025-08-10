@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,12 +52,15 @@ class DocumentsControllerIntegrationTest {
 
         Document document = testDocumentFactory.get();
 
-        given(documentsService.getDocument(document.getName())).willReturn(document);
+        String name = document.getName();
+        given(documentsService.getDocument(name)).willReturn(document);
 
-        mockMvc.perform(get("/docs/{name}", document.getName())).andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(document.getName()))
+        mockMvc.perform(get("/docs/{name}", name)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(name))
                 .andExpect(jsonPath("$.content").value(document.getContent()))
                 .andExpect(jsonPath("$.id").value(document.getId())).andReturn();
+
+        then(documentsService).should().getDocument(name);
 
     }
 
@@ -75,6 +78,7 @@ class DocumentsControllerIntegrationTest {
                         });
 
         assertEquals(documents, documentsFromResponse);
+        then(documentsService).should().getAllDocuments();
     }
 
     @Test
@@ -82,10 +86,11 @@ class DocumentsControllerIntegrationTest {
 
         Document document = testDocumentFactory.get();
 
-        willDoNothing().given(documentsService).removeDocument(document.getName());
-        given(documentsService.getDocument(document.getName())).willReturn(document);
+        String name = document.getName();
+        willDoNothing().given(documentsService).removeDocument(name);
+        given(documentsService.getDocument(name)).willReturn(document);
 
-        MvcResult mvcResult = mockMvc.perform(delete("/docs/{name}/delete", document.getName()))
+        MvcResult mvcResult = mockMvc.perform(delete("/docs/{name}/delete", name))
                 .andExpect(status().isOk()).andReturn();
 
         HashMap<String, Document> response = objectMapper
@@ -93,8 +98,9 @@ class DocumentsControllerIntegrationTest {
                         new TypeReference<HashMap<String, Document>>() {
                         });
 
-        assertEquals(response.get("deleted").getName(), document.getName());
-
+        assertEquals(response.get("deleted").getName(), name);
+        then(documentsService).should().removeDocument(name);
+        then(documentsService).should().getDocument(name);
 
     }
 
@@ -112,6 +118,8 @@ class DocumentsControllerIntegrationTest {
         Document addedDocument = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Document.class);
 
         assertEquals(document, addedDocument);
+
+        then(documentsService).should().addDocument(document);
     }
 
     @Test
@@ -119,10 +127,13 @@ class DocumentsControllerIntegrationTest {
         Document document = testDocumentFactory.get();
         String newName = "Foo";
 
-        given(documentsService.changeDocumentsName(document.getName(), newName)).willReturn(document);
+        String name = document.getName();
+        given(documentsService.changeDocumentsName(name, newName)).willReturn(document);
 
-        mockMvc.perform(patch("/docs/{name}", document.getName()).param("newName", newName))
+        mockMvc.perform(patch("/docs/{name}", name).param("newName", newName))
                 .andExpect(status().isOk()).andReturn();
+
+        then(documentsService).should().changeDocumentsName(name, newName);
 
     }
 

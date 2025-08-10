@@ -14,18 +14,15 @@ import pl.piotrowski.remotetexteditor.configuration.TestContext;
 import pl.piotrowski.remotetexteditor.dataaccess.DocumentsRepository;
 import pl.piotrowski.remotetexteditor.model.Document;
 import pl.piotrowski.remotetexteditor.model.Update;
-import pl.piotrowski.remotetexteditor.service.exceptions.DocumentNotFoundException;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestContext.class, Application.class})
