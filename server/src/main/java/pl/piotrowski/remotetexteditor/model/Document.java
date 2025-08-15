@@ -23,14 +23,14 @@ public class Document implements Editable, Serializable, Updatable {
     public void insertContent(String newContent, int position) {
         String temp = content.substring(0,position);
         temp = temp.concat(newContent);
-        content = temp.concat(content.substring(position,content.length()));
+        content = temp.concat(content.substring(position));
     }
 
     @Override
     public void replaceContent(String newContent, int position) {
         String temp = content.substring(0,position);
         temp = temp.concat(newContent);
-        content = temp.concat(content.substring(position+newContent.length(), content.length()));
+        content = temp.concat(content.substring(position+newContent.length()));
 
     }
 
@@ -84,10 +84,14 @@ public class Document implements Editable, Serializable, Updatable {
         if (update.isAppending()){
             content = content+update.getContent();
         } else  {
-            String first = content.substring(0, update.getStart());
-            String last = content.substring(update.getEnd());
+            try {
+                String first = content.substring(0, update.getStart());
+                String last = content.substring(update.getEnd());
 
-            content = first+update.getContent()+last;
+                content = first+update.getContent()+last;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

@@ -30,7 +30,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 class DocumentsServiceTest {
 
     @Autowired
-    private DocumentsService documentsService;
+    private DefaultDocumentsService documentsService;
     @Autowired
     private Supplier<Document> testDocumentFactory;
     @Autowired

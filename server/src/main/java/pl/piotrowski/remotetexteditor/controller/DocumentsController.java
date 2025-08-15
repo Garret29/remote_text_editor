@@ -6,6 +6,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import pl.piotrowski.remotetexteditor.application.DocumentsService;
@@ -21,31 +22,33 @@ import java.util.HashSet;
 @Controller
 @RequestMapping("/docs")
 @CrossOrigin
-public class DocumentsController implements pl.piotrowski.remotetexteditor.application.DocumentsController {
+public class DocumentsController {
 
-    private DocumentsService documentsService;
+    private final DocumentsService documentsService;
 
     @Autowired
     public DocumentsController(DocumentsService documentsService) {
         this.documentsService = documentsService;
     }
 
-    @Override
     @MessageMapping("/update/{name}")
     @SendTo("/topic/updates/{name}")
     public Update updateDocumentsContent(@DestinationVariable String name, @Payload Update update) {
 
-        try {
-            documentsService.updateDocumentsContent(name, update);
-        } catch (DocumentNotFoundException e) {
-            e.printStackTrace();
-        }
+        tryUpdate(name, update);
 
 
         return update;
     }
 
-    @Override
+    private void tryUpdate(String name, Update update) {
+        try {
+            documentsService.updateDocumentsContent(name, update);
+        } catch (DocumentNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     @GetMapping("/{name}")
     public ResponseEntity<Document> getDocument(@PathVariable String name) {
         try {
@@ -56,7 +59,7 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
         }
     }
 
-    @Override
+
     @PostMapping
     public ResponseEntity<Document> createDocument(@RequestBody Document document) {
         try {
@@ -67,7 +70,6 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
         return ResponseEntity.ok(document);
     }
 
-    @Override
     @DeleteMapping("/{name}/delete")
     public ResponseEntity<HashMap<String, Document>> deleteDocument(@PathVariable String name) {
         HashMap<String, Document> documents = new HashMap<>();
@@ -82,13 +84,11 @@ public class DocumentsController implements pl.piotrowski.remotetexteditor.appli
         return ResponseEntity.ok(documents);
     }
 
-    @Override
     @GetMapping
     public ResponseEntity<HashSet<Document>> getDocuments() {
         return ResponseEntity.ok(documentsService.getAllDocuments());
     }
 
-    @Override
     @PatchMapping("/{name}")
     public ResponseEntity<String> renameDocument(@PathVariable String name, @RequestParam String newName) {
         try {

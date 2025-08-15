@@ -2,6 +2,7 @@ package pl.piotrowski.remotetexteditor.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.piotrowski.remotetexteditor.application.DocumentsService;
 import pl.piotrowski.remotetexteditor.dataaccess.DocumentsRepository;
 import pl.piotrowski.remotetexteditor.model.Document;
 import pl.piotrowski.remotetexteditor.model.Update;
@@ -13,12 +14,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class DocumentsService implements pl.piotrowski.remotetexteditor.application.DocumentsService {
+public class DefaultDocumentsService implements DocumentsService {
 
-    private DocumentsRepository documentsRepository;
+    private final DocumentsRepository documentsRepository;
 
     @Autowired
-    public DocumentsService(DocumentsRepository documentsRepository) {
+    public DefaultDocumentsService(DocumentsRepository documentsRepository) {
         this.documentsRepository = documentsRepository;
     }
 
@@ -50,6 +51,7 @@ public class DocumentsService implements pl.piotrowski.remotetexteditor.applicat
         found.applyUpdate(update);
         return documentsRepository.save(found);
     }
+
 
     @Override
     public Document getDocument(String name) throws DocumentNotFoundException {
