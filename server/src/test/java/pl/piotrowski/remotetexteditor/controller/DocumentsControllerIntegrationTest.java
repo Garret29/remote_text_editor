@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import pl.piotrowski.remotetexteditor.Application;
 import pl.piotrowski.remotetexteditor.application.DocumentsService;
 import pl.piotrowski.remotetexteditor.configuration.TestContext;
+import pl.piotrowski.remotetexteditor.dataaccess.DocumentsRepository;
 import pl.piotrowski.remotetexteditor.model.Document;
 
 import java.util.HashMap;
@@ -46,6 +47,8 @@ class DocumentsControllerIntegrationTest {
     private ObjectMapper objectMapper;
     @MockBean
     private DocumentsService documentsService;
+    @MockBean
+    private DocumentsRepository documentsRepository;
 
     @Test
     void getDocumentTest() throws Exception {
@@ -90,7 +93,7 @@ class DocumentsControllerIntegrationTest {
         willDoNothing().given(documentsService).removeDocument(name);
         given(documentsService.getDocument(name)).willReturn(document);
 
-        MvcResult mvcResult = mockMvc.perform(delete("/docs/{name}/delete", name))
+        MvcResult mvcResult = mockMvc.perform(delete("/docs/{name}", name))
                 .andExpect(status().isOk()).andReturn();
 
         HashMap<String, Document> response = objectMapper

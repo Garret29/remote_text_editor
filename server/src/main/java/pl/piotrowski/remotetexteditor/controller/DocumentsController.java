@@ -70,7 +70,7 @@ public class DocumentsController {
         return ResponseEntity.ok(document);
     }
 
-    @DeleteMapping("/{name}/delete")
+    @DeleteMapping("/{name}")
     public ResponseEntity<HashMap<String, Document>> deleteDocument(@PathVariable String name) {
         HashMap<String, Document> documents = new HashMap<>();
 

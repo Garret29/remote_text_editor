@@ -37,7 +37,7 @@ export class DocumentService implements OnInit{
   }
 
   deleteDocument(documentName: String): Rx.Observable<Document> {
-    return this.http.delete<Document>(this.webConfig.restUrl+"/"+documentName+"/delete");
+    return this.http.delete<Document>(this.webConfig.restUrl+"/"+documentName);
   }
 
   renameDocument(oldName: String, newName: String): Rx.Observable<String>{
